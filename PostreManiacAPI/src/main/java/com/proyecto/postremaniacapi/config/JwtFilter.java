@@ -1,16 +1,26 @@
 package com.proyecto.postremaniacapi.config;
 
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Component;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilter implements Filter {
 
     private final JwtUtil jwtUtil;
 
-    public JwtFilter(JwtUtil jwtUtil){
+    public JwtFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
 
@@ -25,14 +35,36 @@ public class JwtFilter implements Filter {
 
         String header = req.getHeader("Authorization");
 
-        if(header != null && header.startsWith("Bearer ")){
+        if (header != null && header.startsWith("Bearer ")) {
 
             String token = header.substring(7);
 
-            if(jwtUtil.validateToken(token)){
-                String username = jwtUtil.extractUsername(token);
+            try {
+                if (jwtUtil.validateToken(token)) {
 
-                req.setAttribute("username", username);
+                    String username = jwtUtil.extractUsername(token);
+                    String rol = jwtUtil.extractRol(token);
+
+
+                    // 🔐 Crear autoridad (rol)
+                    List<SimpleGrantedAuthority> authorities =
+                            List.of(new SimpleGrantedAuthority(rol));
+
+
+                    // 🔐 Crear autenticación
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    username,
+                                    null,
+                                    authorities
+                            );
+
+                    // 🔥 REGISTRAR USUARIO EN SPRING SECURITY
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+
+            } catch (Exception e) {
+                System.out.println("Error validando token: " + e.getMessage());
             }
         }
 

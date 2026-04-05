@@ -8,16 +8,18 @@ public class Producto {
     private double precio;
     private int stock;
     private String estado;
+    private String id;
 
     public Producto() {}
 
-    public Producto(String imagen, String nombre, String descripcion, double precio, int stock, String estado) {
+    public Producto(String imagen, String nombre, String descripcion, double precio, int stock, String estado, String id) {
         this.imagen = imagen;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.stock = stock;
         this.estado = estado;
+        this.id = id;
     }
 
     public String getImagen() {
@@ -67,4 +69,8 @@ public class Producto {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+
+    public String getId() {return id;}
+
+    public void setId(String id) {this.id = id;}
 }
