@@ -9,13 +9,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UsuarioRepository {
 
+    // 🔥 GUARDAR USUARIO CON ID PERSONALIZADO
     public void guardarUsuario(Usuario usuario) throws Exception {
 
         Firestore db = FirestoreClient.getFirestore();
 
-        db.collection("usuarios").add(usuario);
+        db.collection("usuarios")
+                .document(usuario.getId()) // 🔥 usamos el ID generado
+                .set(usuario);
     }
 
+    // 🔍 BUSCAR POR USERNAME
     public Usuario buscarPorUsername(String username) throws Exception {
 
         Firestore db = FirestoreClient.getFirestore();
@@ -29,6 +33,11 @@ public class UsuarioRepository {
             return null;
         }
 
-        return query.getDocuments().get(0).toObject(Usuario.class);
+        Usuario user = query.getDocuments().get(0).toObject(Usuario.class);
+
+        // 🔥 IMPORTANTE: recuperar el ID del documento
+        user.setId(query.getDocuments().get(0).getId());
+
+        return user;
     }
 }

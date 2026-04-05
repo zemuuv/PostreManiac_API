@@ -18,17 +18,19 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String username, String rol){
+    public String generateToken(String id, String username, String rol){
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("id", id) // 🔥 NUEVO
                 .claim("rol", rol)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
-                .signWith(getKey()) // ✅ CORRECTO
+                .signWith(getKey())
                 .compact();
     }
 
+    // 🔍 USERNAME
     public String extractUsername(String token){
         return Jwts.parserBuilder()
                 .setSigningKey(getKey())
@@ -38,6 +40,7 @@ public class JwtUtil {
                 .getSubject();
     }
 
+    // 🔍 ROL
     public String extractRol(String token){
         return (String) Jwts.parserBuilder()
                 .setSigningKey(getKey())
@@ -47,6 +50,17 @@ public class JwtUtil {
                 .get("rol");
     }
 
+    // 🔥 🔍 ID (NUEVO)
+    public String extractUserId(String token){
+        return (String) Jwts.parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("id");
+    }
+
+    // 🔐 VALIDAR TOKEN
     public boolean validateToken(String token){
         try{
             Jwts.parserBuilder()
@@ -55,6 +69,7 @@ public class JwtUtil {
                     .parseClaimsJws(token);
             return true;
         }catch(Exception e){
+            System.out.println("Error validando token: " + e.getMessage());
             return false;
         }
     }

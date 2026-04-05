@@ -6,6 +6,8 @@ import com.proyecto.postremaniacapi.repository.UsuarioRepository;
 import com.proyecto.postremaniacapi.config.JwtUtil;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID; // 🔥 IMPORTANTE
+
 @Service
 public class AuthService {
 
@@ -17,7 +19,7 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    // REGISTRO USUARIO NORMAL
+    // ✅ REGISTRO USUARIO NORMAL
     public String register(RegisterRequest request) throws Exception {
 
         validarPassword(request.getPassword(), request.getConfirmPassword());
@@ -27,10 +29,13 @@ public class AuthService {
         }
 
         Usuario user = new Usuario();
+
+        // 🔥 GENERAR ID ÚNICO
+        user.setId(UUID.randomUUID().toString());
+
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-
         user.setRol("USER");
 
         usuarioRepository.guardarUsuario(user);
@@ -38,20 +43,21 @@ public class AuthService {
         return "Usuario registrado correctamente";
     }
 
-    // REGISTRO ADMIN
+    // ✅ REGISTRO ADMIN
     public String registerAdmin(RegisterAdminRequest request) throws Exception {
-
-        validarPassword(request.getPassword(), request.getConfirmPassword());
 
         if(usuarioRepository.buscarPorUsername(request.getUsername()) != null){
             throw new RuntimeException("El usuario ya existe");
         }
 
         Usuario user = new Usuario();
+
+        // 🔥 GENERAR ID ÚNICO
+        user.setId(UUID.randomUUID().toString());
+
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-
         user.setRol(request.getRol());
 
         usuarioRepository.guardarUsuario(user);
@@ -59,7 +65,7 @@ public class AuthService {
         return "Administrador registrado correctamente";
     }
 
-    // LOGIN
+    // 🔐 LOGIN
     public String login(LoginRequest request) throws Exception {
 
         Usuario user = usuarioRepository.buscarPorUsername(request.getUsername());
@@ -74,10 +80,11 @@ public class AuthService {
 
         System.out.println("Usuario login correctamente");
 
-        return jwtUtil.generateToken(user.getUsername(), user.getRol());
+        // 🔥 RECOMENDADO: incluir ID en el token
+        return jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRol());
     }
 
-    // VALIDACION CONTRASEÑA
+    // 🔐 VALIDACIÓN CONTRASEÑA
     private void validarPassword(String password, String confirmPassword){
 
         if(!password.equals(confirmPassword)){

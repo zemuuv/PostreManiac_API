@@ -15,15 +15,23 @@ public class ProductoRepository {
 
     private static final String COLECCION = "productos";
 
+    // 🔥 CREAR PRODUCTO CON ID CONTROLADO
     public String crearProducto(Producto producto) throws ExecutionException, InterruptedException {
 
         Firestore db = FirestoreClient.getFirestore();
 
-        ApiFuture<DocumentReference> future = db.collection(COLECCION).add(producto);
+        // ✅ usamos el ID que ya viene desde el service
+        ApiFuture<WriteResult> future = db
+                .collection(COLECCION)
+                .document(producto.getId())
+                .set(producto);
 
-        return future.get().getId();
+        future.get(); // esperar confirmación
+
+        return producto.getId();
     }
 
+    // 📦 OBTENER PRODUCTOS (IMPORTANTE: SETEAR ID)
     public List<Producto> obtenerProductos() throws ExecutionException, InterruptedException {
 
         Firestore db = FirestoreClient.getFirestore();
@@ -37,7 +45,8 @@ public class ProductoRepository {
         for (QueryDocumentSnapshot doc : documentos) {
 
             Producto producto = doc.toObject(Producto.class);
-            producto.setImagen(doc.getId());
+
+            producto.setId(doc.getId());
 
             productos.add(producto);
         }
@@ -45,13 +54,17 @@ public class ProductoRepository {
         return productos;
     }
 
+    // ✏️ ACTUALIZAR
     public void actualizarProducto(String id, Producto producto) {
 
         Firestore db = FirestoreClient.getFirestore();
 
+        producto.setId(id);
+
         db.collection(COLECCION).document(id).set(producto);
     }
 
+    // ❌ ELIMINAR
     public void eliminarProducto(String id) {
 
         Firestore db = FirestoreClient.getFirestore();
