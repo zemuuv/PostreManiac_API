@@ -32,18 +32,23 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
 
-                        // 🔓 PUBLICO
+                        // 🔓 AUTH (PUBLICO)
                         .requestMatchers("/auth/**").permitAll()
 
                         // 📦 PRODUCTOS
-                        .requestMatchers(HttpMethod.GET, "/productos/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/productos/**").authenticated() // 👈 mejor UX
                         .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority("ADMIN")
 
+                        // 💬 COMENTARIOS
+                        .requestMatchers(HttpMethod.GET, "/comentarios/**").authenticated() // ver comentarios
+                        .requestMatchers(HttpMethod.POST, "/comentarios/**").authenticated() // crear
+                        .requestMatchers(HttpMethod.DELETE, "/comentarios/**").authenticated() // eliminar
+
                         // 🛒 PEDIDOS
-                        .requestMatchers(HttpMethod.POST, "/api/pedidos").authenticated() // crear pedido
-                        .requestMatchers(HttpMethod.GET, "/api/pedidos/mis-pedidos").authenticated() // cliente
+                        .requestMatchers(HttpMethod.POST, "/api/pedidos").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/pedidos/mis-pedidos").authenticated()
 
                         // 👑 ADMIN PEDIDOS
                         .requestMatchers("/api/pedidos/**").hasAuthority("ADMIN")
