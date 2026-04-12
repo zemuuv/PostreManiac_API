@@ -42,16 +42,15 @@ public class JwtFilter implements Filter {
             try {
                 if (jwtUtil.validateToken(token)) {
 
+                    String userId = jwtUtil.extractUserId(token); // 🔥 NUEVO
                     String username = jwtUtil.extractUsername(token);
                     String rol = jwtUtil.extractRol(token);
 
-
-                    // 🔐 Crear autoridad (rol)
+                    // 🔐 Autoridades
                     List<SimpleGrantedAuthority> authorities =
                             List.of(new SimpleGrantedAuthority(rol));
 
-
-                    // 🔐 Crear autenticación
+                    // 🔐 Autenticación
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
                                     username,
@@ -59,8 +58,12 @@ public class JwtFilter implements Filter {
                                     authorities
                             );
 
-                    // 🔥 REGISTRAR USUARIO EN SPRING SECURITY
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    // 🔥🔥🔥 ESTA ES LA CLAVE
+                    req.setAttribute("userId", userId);
+                    req.setAttribute("username", username);
+
                 }
 
             } catch (Exception e) {
