@@ -42,9 +42,10 @@ public class JwtFilter implements Filter {
             try {
                 if (jwtUtil.validateToken(token)) {
 
-                    String userId = jwtUtil.extractUserId(token); // 🔥 NUEVO
+                    String userId = jwtUtil.extractUserId(token);
                     String username = jwtUtil.extractUsername(token);
                     String rol = jwtUtil.extractRol(token);
+                    String email = jwtUtil.extractEmail(token);
 
                     // 🔐 Autoridades
                     List<SimpleGrantedAuthority> authorities =
@@ -60,9 +61,10 @@ public class JwtFilter implements Filter {
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    // 🔥🔥🔥 ESTA ES LA CLAVE
+                    // 🔥 ATRIBUTOS DISPONIBLES EN CONTROLADORES
                     req.setAttribute("userId", userId);
                     req.setAttribute("username", username);
+                    req.setAttribute("email", email);
 
                 }
 

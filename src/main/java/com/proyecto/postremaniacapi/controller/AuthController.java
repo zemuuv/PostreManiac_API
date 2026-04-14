@@ -4,6 +4,8 @@ import com.proyecto.postremaniacapi.dto.*;
 import com.proyecto.postremaniacapi.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -28,7 +30,7 @@ public class AuthController {
 
     // 🔐 Login
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) throws Exception {
+    public Map<String, Object> login(@RequestBody LoginRequest request) throws Exception {
         return authService.login(request);
     }
 }

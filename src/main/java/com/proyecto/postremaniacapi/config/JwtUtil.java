@@ -18,12 +18,14 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String id, String username, String rol){
+    // 🔥 AHORA INCLUYE EMAIL
+    public String generateToken(String id, String username, String rol, String email){
 
         return Jwts.builder()
                 .setSubject(username)
-                .claim("id", id) // 🔥 NUEVO
+                .claim("id", id)
                 .claim("rol", rol)
+                .claim("email", email) // 🔥 NUEVO
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(getKey())
@@ -50,7 +52,7 @@ public class JwtUtil {
                 .get("rol");
     }
 
-    // 🔥 🔍 ID (NUEVO)
+    // 🔍 ID
     public String extractUserId(String token){
         return (String) Jwts.parserBuilder()
                 .setSigningKey(getKey())
@@ -58,6 +60,16 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .get("id");
+    }
+
+    // 🔍 EMAIL
+    public String extractEmail(String token){
+        return (String) Jwts.parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("email");
     }
 
     // 🔐 VALIDAR TOKEN

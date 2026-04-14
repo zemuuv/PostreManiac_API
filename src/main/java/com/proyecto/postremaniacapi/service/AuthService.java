@@ -6,6 +6,7 @@ import com.proyecto.postremaniacapi.repository.UsuarioRepository;
 import com.proyecto.postremaniacapi.config.JwtUtil;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.UUID; // 🔥 IMPORTANTE
 
 @Service
@@ -66,7 +67,7 @@ public class AuthService {
     }
 
     // 🔐 LOGIN
-    public String login(LoginRequest request) throws Exception {
+    public Map<String, Object> login(LoginRequest request) throws Exception {
 
         Usuario user = usuarioRepository.buscarPorUsername(request.getUsername());
 
@@ -80,8 +81,21 @@ public class AuthService {
 
         System.out.println("Usuario login correctamente");
 
-        // 🔥 RECOMENDADO: incluir ID en el token
-        return jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRol());
+        // 🔥 GENERAR TOKEN CON EMAIL (IMPORTANTE)
+        String token = jwtUtil.generateToken(
+                user.getId(),
+                user.getUsername(),
+                user.getRol(),
+                user.getEmail() // 🔥 ahora sí
+        );
+
+        // 🔥 DEVOLVER OBJETO COMPLETO
+        return Map.of(
+                "token", token,
+                "username", user.getUsername(),
+                "email", user.getEmail(),
+                "rol", user.getRol()
+        );
     }
 
     // 🔐 VALIDACIÓN CONTRASEÑA
